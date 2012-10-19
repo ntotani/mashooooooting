@@ -6,22 +6,49 @@
   window.onload = function() {
     var game;
     game = new Game(640, 480);
+    game.preload('icon0.png');
     game.onload = function() {
-      var back, bear, center, map;
+      var back, bear, boss, center, map, volt;
       back = new Sprite(game.width, game.height);
       bear = new Sprite(32, 32);
       bear.image = Surface.load(twitter_info['profile_image_url']);
+      bear.addEventListener(Event.ENTER_FRAME, function() {
+        var bullet, voltNum;
+        voltNum = parseInt(volt.text);
+        if (bear.age % 10 === 0 && voltNum > 0) {
+          volt.text = voltNum - 1;
+          bullet = new Sprite(16, 16);
+          bullet.image = game.assets['icon0.png'];
+          bullet.frame = 48;
+          bullet.x = bear.x + (bear.width - bullet.width) / 2;
+          bullet.y = bear.y;
+          bullet.addEventListener(Event.ENTER_FRAME, function() {
+            this.y -= 10;
+            if (this.y < -this.height) {
+              return this.parentNode.removeChild(this);
+            }
+          });
+          return game.rootScene.addChild(bullet);
+        }
+      });
+      boss = new Sprite(124, 124);
+      boss.image = Surface.load(daily_ranking.rankings[0].icon);
+      boss.x = (game.width - boss.width) / 2;
+      volt = new Label(electric);
       game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
         bear.x = e.x;
         return bear.y = e.y;
       });
       game.rootScene.addChild(back);
       game.rootScene.addChild(bear);
+      game.rootScene.addChild(boss);
+      game.rootScene.addChild(volt);
       center = new google.maps.LatLng(start_lat, start_lng);
       map = new google.maps.Map(back._element, {
         zoom: 18,
         center: center,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        disableDefaultUI: true
       });
       return game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
         center = new google.maps.LatLng(center.lat() + 0.000003, center.lng());

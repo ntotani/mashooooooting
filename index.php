@@ -31,7 +31,7 @@ if($user) {
 $daily_ranking = file_get_contents('daily_ranking.json');
 $file = new SplFileObject("electric.csv");
 $electric = 3000;
-$hour = (date('H') - 1) . ':00';
+$hour = (date('H') - 2) . ':00';
 while (!$file->eof()) {
     $row = $file->fgetcsv();
     if(isset($row[1]) && $row[1] == $hour) {
