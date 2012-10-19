@@ -13,9 +13,9 @@
 <script type="text/javascript">
 enchant();
 window.onload = function() {
-    var latlng = new google.maps.LatLng(-34.397, 150.644);
+    var latlng = new google.maps.LatLng(35.6614274, 139.7292734);
     var myOptions = {
-        zoom: 8,
+        zoom: 18,
             center: latlng,
             mapTypeId: google.maps.MapTypeId.ROADMAP
     };
@@ -32,6 +32,10 @@ window.onload = function() {
         game.rootScene.addChild(back);
         game.rootScene.addChild(bear);
         var map = new google.maps.Map(back._element, myOptions);
+        game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
+            latlng = new google.maps.LatLng(latlng.lat() + 0.000003, latlng.lng());
+            map.setCenter(latlng);
+        });
     }
     game.start();
 }
