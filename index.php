@@ -1,5 +1,16 @@
 <?php
+$daily_ranking = file_get_contents('daily_ranking.json');
+$file = new SplFileObject("electric.csv");
+$hour = (date('H') - 1) . ':00';
+while (!$file->eof()) {
+    $row = $file->fgetcsv();
+    if(isset($row[1]) && $row[1] == $hour) {
+        $electric = $row[2];
+        break;
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,6 +22,10 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript" src="enchant.min.js"></script>
 <script type="text/javascript" src="main.js"></script>
+<script type="text/javascript">
+var daily_ranking = <?php echo $daily_ranking; ?>;
+var electric = <?php echo $electric; ?>;
+</script>
 </head>
 <body>
   <div id="enchant-stage"></div>
