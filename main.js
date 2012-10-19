@@ -17,7 +17,7 @@
       });
       game.rootScene.addChild(back);
       game.rootScene.addChild(bear);
-      center = new google.maps.LatLng(35.6614274, 139.7292734);
+      center = new google.maps.LatLng(start_lat, start_lng);
       map = new google.maps.Map(back._element, {
         zoom: 18,
         center: center,
@@ -28,7 +28,13 @@
         return map.setCenter(center);
       });
     };
-    return game.start();
+    game.start();
+    return navigator.geolocation.getCurrentPosition(function(pos) {
+      return $.post('./updatelatlng', {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      });
+    });
   };
 
 }).call(this);

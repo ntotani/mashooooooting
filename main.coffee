@@ -11,7 +11,7 @@ window.onload = ->
       bear.y = e.y
     game.rootScene.addChild back
     game.rootScene.addChild bear
-    center = new google.maps.LatLng 35.6614274, 139.7292734
+    center = new google.maps.LatLng start_lat, start_lng
     map = new google.maps.Map back._element,
       zoom:18,
       center:center,
@@ -20,3 +20,7 @@ window.onload = ->
       center = new google.maps.LatLng center.lat() + 0.000003, center.lng()
       map.setCenter center
   game.start()
+  navigator.geolocation.getCurrentPosition (pos) ->
+    $.post './updatelatlng',
+      lat: pos.coords.latitude
+      lng: pos.coords.longitude
