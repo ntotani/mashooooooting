@@ -12,6 +12,7 @@ $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $access_token['oau
 $connection->decode_json = false;
 $twitter_info = $connection->get('account/verify_credentials');
 $twitter_info_array = json_decode($twitter_info, true);
+$home_timeline = $connection->get('statuses/home_timeline');
 
 $db = new PDO(DB_DSN, DB_USER, DB_PASSWD);
 $sql = 'select * from mashooooooting where twitter_id = ?';
@@ -58,6 +59,7 @@ while (!$file->eof()) {
             var twitter_info = <?php echo $twitter_info; ?>;
             var start_lat = <?php echo $start_lat; ?>;
             var start_lng = <?php echo $start_lng; ?>;
+            var home_timeline = <?php echo $home_timeline; ?>;
         </script>
     </head>
     <body>
