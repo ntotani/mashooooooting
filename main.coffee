@@ -2,11 +2,10 @@ enchant()
 
 window.onload = ->
   game = new Game 640, 480
-  game.preload 'chara1.png'
   game.onload = ->
     back = new Sprite game.width, game.height
     bear = new Sprite 32, 32
-    bear.image = game.assets['chara1.png']
+    bear.image = Surface.load twitter_info['profile_image_url']
     game.rootScene.addEventListener Event.TOUCH_START, (e)->
       bear.x = e.x
       bear.y = e.y

@@ -1,4 +1,17 @@
 <?php
+session_start();
+if(empty($_SESSION['access_token']) || empty($_SESSION['access_token']['oauth_token']) || empty($_SESSION['access_token']['oauth_token_secret'])) {
+   header('Location: ./login.html');
+   exit;
+}
+require_once('../../libs/twitteroauth/twitteroauth.php');
+require_once('../../config.php');
+
+$access_token = $_SESSION['access_token'];
+$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $access_token['oauth_token'], $access_token['oauth_token_secret']);
+$connection->decode_json = false;
+$twitter_info = $connection->get('account/verify_credentials');
+
 $daily_ranking = file_get_contents('daily_ranking.json');
 $file = new SplFileObject("electric.csv");
 $electric = 3000;
@@ -26,6 +39,7 @@ while (!$file->eof()) {
         <script type="text/javascript">
             var daily_ranking = <?php echo $daily_ranking; ?>;
             var electric = <?php echo $electric; ?>;
+            var twitter_info = <?php echo $twitter_info; ?>;
         </script>
     </head>
     <body>
