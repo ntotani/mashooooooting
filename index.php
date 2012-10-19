@@ -10,37 +10,7 @@
 </style>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript" src="enchant.min.js"></script>
-<script type="text/javascript">
-enchant();
-window.onload = function() {
-    var latlng = new google.maps.LatLng(35.6614274, 139.7292734);
-    var myOptions = {
-        zoom: 18,
-            center: latlng,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var game = new Game(640, 480);
-    game.preload('chara1.png');
-    game.onload = function() {
-        var back = new Sprite(game.width, game.height);
-        var bear = new Sprite(32, 32);
-        bear.image = game.assets['chara1.png'];
-        game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
-            bear.x = e.x;
-            bear.y = e.y;
-        });
-        game.rootScene.addChild(back);
-        game.rootScene.addChild(bear);
-        var map = new google.maps.Map(back._element, myOptions);
-        game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
-            latlng = new google.maps.LatLng(latlng.lat() + 0.000003, latlng.lng());
-            map.setCenter(latlng);
-        });
-    }
-    game.start();
-}
-
-</script>
+<script type="text/javascript" src="main.js"></script>
 </head>
 <body>
   <div id="enchant-stage"></div>
