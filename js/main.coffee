@@ -2,7 +2,7 @@ enchant()
 
 window.onload = ->
   game = new Game 640, 480
-  game.preload 'icon0.png'
+  game.preload 'img/icon0.png'
   game.onload = ->
     back = new Sprite game.width, game.height
     bear = new Sprite 32, 32
@@ -12,7 +12,7 @@ window.onload = ->
       if bear.age % 10 is 0 and voltNum > 0
         volt.text = voltNum - 1
         bullet = new Sprite 16, 16
-        bullet.image = game.assets['icon0.png']
+        bullet.image = game.assets['img/icon0.png']
         bullet.frame = 48
         bullet.x = bear.x + (bear.width - bullet.width) / 2
         bullet.y = bear.y

@@ -7,7 +7,7 @@
  * includes: MutableText, ScoreLabel, TimeLabel, LifeLabel, Bar, Material, ExSprite
  */
 
-enchant.util = { assets: ['effect0.gif', 'icon0.gif', 'font.png'] };
+enchant.util = { assets: ['img/font.png'] };
 
 // 背景専用スプライト
 enchant.util.Wallpaper = enchant.Class.create(enchant.Sprite, { // Spriteを継承したクラスを作成する
@@ -55,7 +55,7 @@ enchant.util.MutableText = enchant.Class.create(enchant.Sprite, {
             }
             x = charPos % this.widthItemNum;
             y = (charPos / this.widthItemNum) | 0;
-            this.image.draw(enchant.Game.instance.assets['font.png'],
+            this.image.draw(enchant.Game.instance.assets['img/font.png'],
                 x * this.fontSize, y * this.fontSize, this.fontSize, this.fontSize,
                 (i % this.row) * this.fontSize, ((i / this.row) | 0) * this.fontSize, this.fontSize, this.fontSize);
         }

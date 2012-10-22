@@ -6,7 +6,7 @@
   window.onload = function() {
     var game;
     game = new Game(640, 480);
-    game.preload('icon0.png');
+    game.preload('img/icon0.png');
     game.onload = function() {
       var back, bear, boss, center, map, volt;
       back = new Sprite(game.width, game.height);
@@ -18,7 +18,7 @@
         if (bear.age % 10 === 0 && voltNum > 0) {
           volt.text = voltNum - 1;
           bullet = new Sprite(16, 16);
-          bullet.image = game.assets['icon0.png'];
+          bullet.image = game.assets['img/icon0.png'];
           bullet.frame = 48;
           bullet.x = bear.x + (bear.width - bullet.width) / 2;
           bullet.y = bear.y;
