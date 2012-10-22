@@ -52,6 +52,7 @@ while (!$file->eof()) {
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script type="text/javascript" src="enchant.min.js"></script>
+        <script type="text/javascript" src="util.enchant.js"></script>
         <script type="text/javascript" src="main.js"></script>
         <script type="text/javascript">
             var daily_ranking = <?php echo $daily_ranking; ?>;
