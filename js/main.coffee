@@ -10,7 +10,7 @@ window.onload = ->
     bear.addEventListener Event.ENTER_FRAME, ->
       voltNum = parseInt volt.text
       if bear.age % 10 is 0 and voltNum > 0
-        volt.text = voltNum - 1
+        volt.text = '' + (voltNum - 1)
         bullet = new Sprite 16, 16
         bullet.image = game.assets['img/icon0.png']
         bullet.frame = 48
@@ -23,10 +23,15 @@ window.onload = ->
     boss = new Sprite 124, 124
     boss.image = Surface.load daily_ranking.rankings[0].icon
     boss.x = (game.width - boss.width) / 2
-    volt = new Label electric
+    volt = new MutableText 0, 0
+    volt.text = '' + electric
     game.rootScene.addEventListener Event.TOUCH_START, (e)->
-      bear.x = e.x
-      bear.y = e.y
+      from =
+        x: bear.x + bear.width  / 2,
+        y: bear.y + bear.height / 2
+      dist = Math.sqrt(Math.pow(e.x - from.x, 2) + Math.pow(e.y - from.y, 2))
+      bear.tl.clear()
+      bear.tl.moveTo e.x - bear.width / 2, e.y - bear.height / 2, dist / 10, enchant.Easing.SIN_EASEINOUT
     game.rootScene.addChild back
     game.rootScene.addChild bear
     game.rootScene.addChild boss
