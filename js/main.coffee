@@ -4,38 +4,145 @@ window.onload = ->
   game = new Game 640, 480
   game.preload 'img/icon0.png'
   game.onload = ->
-    back = new Sprite game.width, game.height
-    bear = new Sprite 32, 32
-    bear.image = Surface.load twitter_info['profile_image_url']
-    bear.addEventListener Event.ENTER_FRAME, ->
-      voltNum = parseInt volt.text
-      if bear.age % 10 is 0 and voltNum > 0
+    class Ship extends Sprite
+      constructor:(url=twitter_info['profile_image_url'])->
+        super 32, 32
+        Surface.load(url).onload = (e) =>
+          icon = new Surface @width, @height
+          icon.draw e.target, 0, 0, @width, @height
+          @image = icon
+        @x = (game.width - @width) / 2
+        @y = (game.height - @height) / 2
+      onenterframe:->
+        @shoot() if @age % 10 is 0
+      shoot:->
+        voltNum = parseInt volt.text
+        return if voltNum <= 0
         volt.text = '' + (voltNum - 1)
         bullet = new Sprite 16, 16
         bullet.image = game.assets['img/icon0.png']
         bullet.frame = 48
-        bullet.x = bear.x + (bear.width - bullet.width) / 2
-        bullet.y = bear.y
-        bullet.addEventListener Event.ENTER_FRAME, ->
-          this.y -= 10
-          this.parentNode.removeChild this if this.y < -this.height
-        game.rootScene.addChild bullet
+        bullet.x = @x + (@width - bullet.width) / 2
+        bullet.y = @y
+        bullet.onenterframe = ->
+          @y -= 10
+          for e in enemyLayer.childNodes
+            if @intersect e
+              @parentNode.removeChild this
+              enemyLayer.removeChild e
+              return
+          @parentNode.removeChild this if @y < -@height
+        blueBulletLayer.addChild bullet
+      updateTarget:(x, y)->
+        from =
+          x: @x + @width  / 2,
+          y: @y + @height / 2
+        dist = Math.sqrt(Math.pow(x - from.x, 2) + Math.pow(y - from.y, 2))
+        @tl.clear()
+        @tl.moveTo x - @width / 2, y - @height / 2, dist / 10, enchant.Easing.SIN_EASEINOUT
+      addFriend:(friend)->
+        friend.dy = @height
+        if shipLayer.childNodes.length is 1
+          friend.dx = -friend.width
+        else if shipLayer.childNodes.length is 2
+          friend.dx = @width
+        friendLayer.removeChild friend
+        shipLayer.addChild friend
+      damage:->
+        len = shipLayer.childNodes.length
+        if len is 1
+          #alert 'game over'
+        else
+          shipLayer.removeChild shipLayer.childNodes[len - 1]
+
+    class Friend extends Ship
+      constructor:(url)->
+        super url
+        @tl.rotateTo(360, 30).then => @rotation = 0
+        @tl.loop()
+        @x = 100
+        @y = 0
+        @help = new MutableText @x - 16, @y - 16
+        @help.text = 'HELP'
+        friendLayer.addChild @help
+        @onenterframe = @initState
+      initState:->
+        @y += 1
+        @help.x = @x
+        @help.y = @y - 16
+        if @y > game.height
+          @help.parentNode.removeChild @help
+          @parentNode.removeChild this
+        else if @intersect ship
+          @tl.clear()
+          @rotation = 0
+          @help.parentNode.removeChild @help
+          ship.addFriend this
+          @onenterframe = @joinState
+      joinState:->
+        @x = ship.x + @dx
+        @y = ship.y + @dy
+        @shoot() if ship.age % 10 is 0
+
+    class Enemy extends Sprite
+      constructor:(url)->
+        super 64, 64
+        Surface.load(url).onload = (e) =>
+          icon = new Surface @width, @height
+          icon.draw e.target, 0, 0, @width, @height
+          @image = icon
+      onenterframe:->
+        @y += 1
+        if @age % 5 is 0
+          bullet = new Sprite 16, 16
+          bullet.image = game.assets['img/icon0.png']
+          bullet.frame = 60
+          bullet.x = @x + (@width - bullet.width) / 2
+          bullet.y = @y + @height
+          bullet.onenterframe = ->
+            @y += 10
+            for e in shipLayer.childNodes
+              if @intersect e
+                @parentNode.removeChild this
+                ship.damage()
+                return
+            @parentNode.removeChild this if @y > game.height
+          redBulletLayer.addChild bullet
+
+    shipLayer = new Group
+    friendLayer = new Group
+    enemyLayer = new Group
+    blueBulletLayer = new Group
+    redBulletLayer = new Group
+
+    back = new Sprite game.width, game.height
+    ship = new Ship
     boss = new Sprite 124, 124
     boss.image = Surface.load daily_ranking.rankings[0].icon
     boss.x = (game.width - boss.width) / 2
     volt = new MutableText 0, 0
     volt.text = '' + electric
     game.rootScene.addEventListener Event.TOUCH_START, (e)->
-      from =
-        x: bear.x + bear.width  / 2,
-        y: bear.y + bear.height / 2
-      dist = Math.sqrt(Math.pow(e.x - from.x, 2) + Math.pow(e.y - from.y, 2))
-      bear.tl.clear()
-      bear.tl.moveTo e.x - bear.width / 2, e.y - bear.height / 2, dist / 10, enchant.Easing.SIN_EASEINOUT
+      ship.updateTarget e.x, e.y
+
+    shipLayer.addChild ship
+    f1 = new Friend(home_timeline[0].user.profile_image_url)
+    f2 = new Friend(home_timeline[1].user.profile_image_url)
+    f2.x = 400
+    friendLayer.addChild f1
+    friendLayer.addChild f2
+    e1 = new Enemy daily_ranking.rankings[9].icon
+    enemyLayer.addChild e1
+
     game.rootScene.addChild back
-    game.rootScene.addChild bear
+    game.rootScene.addChild shipLayer
+    game.rootScene.addChild friendLayer
+    game.rootScene.addChild enemyLayer
+    game.rootScene.addChild blueBulletLayer
+    game.rootScene.addChild redBulletLayer
     game.rootScene.addChild boss
     game.rootScene.addChild volt
+
     center = new google.maps.LatLng start_lat, start_lng
     map = new google.maps.Map back._element,
       zoom:18,
