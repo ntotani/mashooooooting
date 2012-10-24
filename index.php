@@ -40,7 +40,6 @@ while (!$file->eof()) {
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
         <style type="text/css">
             html { height: 100% }
             body { height: 100%; margin: 0px; padding: 0px }
@@ -64,5 +63,7 @@ while (!$file->eof()) {
     </head>
     <body>
         <div id="enchant-stage"></div>
+        <p>ゼビウスなど流しながらお楽しみください</p>
+        <iframe width="420" height="315" src="http://www.youtube.com/embed/b7dBHaBkwAE?autoplay=1" frameborder="0" allowfullscreen></iframe>
     </body>
 </html>

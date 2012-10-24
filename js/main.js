@@ -7,7 +7,7 @@
 
   window.onload = function() {
     var game;
-    game = new Game(640, 480);
+    game = new Game(640, 640);
     game.preload('img/icon0.png', 'img/battery.gif');
     game.onload = function() {
       var Boss, Enemy, Friend, Ship, back, battery, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, start, volt;
@@ -118,7 +118,7 @@
             return _this.rotation = 0;
           });
           this.tl.loop();
-          this.x = param.x || (game.width / this.width) / 2;
+          this.x = param.x || (game.width - this.width) / 2;
           this.y = param.y || -this.height;
           this.help = new MutableText(this.x - 16, this.y - 16);
           this.help.text = 'HELP';
@@ -174,8 +174,8 @@
         }
 
         Enemy.prototype.onenterframe = function() {
-          this.y += 1;
-          if (this.age % 5 === 0) {
+          this.y += 2;
+          if (this.age % 30 === 0) {
             return this.shoot();
           }
         };

@@ -1,7 +1,7 @@
 enchant()
 
 window.onload = ->
-  game = new Game 640, 480
+  game = new Game 640, 640
   game.preload 'img/icon0.png', 'img/battery.gif'
   game.onload = ->
     class Ship extends Sprite
@@ -63,7 +63,7 @@ window.onload = ->
         Friend::counter++
         @tl.rotateTo(360, 30).then => @rotation = 0
         @tl.loop()
-        @x = param.x or (game.width / @width) / 2
+        @x = param.x or (game.width - @width) / 2
         @y = param.y or -@height
         @help = new MutableText @x - 16, @y - 16
         @help.text = 'HELP'
@@ -99,8 +99,8 @@ window.onload = ->
         @y = param.y or -@height
         @hp = param.hp or 1
       onenterframe:->
-        @y += 1
-        @shoot() if @age % 5 is 0
+        @y += 2
+        @shoot() if @age % 30 is 0
       shoot:->
         bullet = new Sprite 16, 16
         bullet.image = game.assets['img/icon0.png']
