@@ -1,18 +1,14 @@
 <?php
 session_start();
-if(empty($_SESSION['access_token']) || empty($_SESSION['access_token']['oauth_token']) || empty($_SESSION['access_token']['oauth_token_secret'])) {
+if(empty($_SESSION['twitter_info']) || empty($_SESSION['home_timeline'])) {
    header('Location: ./login.html');
    exit;
 }
-require_once('../../libs/twitteroauth/twitteroauth.php');
 require_once('../../config.php');
 
-$access_token = $_SESSION['access_token'];
-$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $access_token['oauth_token'], $access_token['oauth_token_secret']);
-$connection->decode_json = false;
-$twitter_info = $connection->get('account/verify_credentials');
+$twitter_info = $_SESSION['twitter_info'];
 $twitter_info_array = json_decode($twitter_info, true);
-$home_timeline = $connection->get('statuses/home_timeline');
+$home_timeline = $_SESSION['home_timeline'];
 
 $db = new PDO(DB_DSN, DB_USER, DB_PASSWD);
 $sql = 'select * from mashooooooting where twitter_id = ?';

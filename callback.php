@@ -9,8 +9,10 @@ if (isset($_REQUEST['oauth_token']) && $_SESSION['oauth_token'] !== $_REQUEST['o
 }
 
 $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
-$access_token = $connection->getAccessToken($_REQUEST['oauth_verifier']);
-$_SESSION['access_token'] = $access_token;
+$connection->getAccessToken($_REQUEST['oauth_verifier']);
+$connection->decode_json = false;
+$_SESSION['twitter_info'] = $connection->get('account/verify_credentials');
+$_SESSION['home_timeline'] = $connection->get('statuses/home_timeline');
 
 unset($_SESSION['oauth_token']);
 unset($_SESSION['oauth_token_secret']);
