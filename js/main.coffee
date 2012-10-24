@@ -85,12 +85,15 @@ window.onload = ->
         @shoot() if ship.age % 10 is 0
 
     class Enemy extends Sprite
-      constructor:(url)->
-        super 64, 64
+      constructor:(param)->
+        super param.w or 32, param.h or 32
+        url = daily_ranking.rankings[param.icon or 8].icon
         Surface.load(url).onload = (e) =>
           icon = new Surface @width, @height
           icon.draw e.target, 0, 0, @width, @height
           @image = icon
+        @x = param.x or 0
+        @y = param.y or -@height
       onenterframe:->
         @y += 1
         if @age % 5 is 0
@@ -139,14 +142,17 @@ window.onload = ->
     friendLayer.addChild f1
     friendLayer.addChild f2
 
-    currentIndex = 0
+    currentIndex = lastAge = 0
     mainState = ->
-      if @age >= level[currentIndex].time
+      while @age >= lastAge + level[currentIndex].time
         event = level[currentIndex]
         if event.type is 'enemy'
-          enemyLayer.addChild new Enemy daily_ranking.rankings[9].icon
+          enemyLayer.addChild new Enemy event
         currentIndex++
-        game.rootScene.onenterframe = (->) if currentIndex >= level.length
+        lastAge = @age
+        if currentIndex >= level.length
+          game.rootScene.onenterframe = (->)
+          break
     game.rootScene.onenterframe = mainState
 
     game.rootScene.addChild back

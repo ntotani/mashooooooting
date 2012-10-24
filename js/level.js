@@ -5,15 +5,17 @@
     {
       time: 0,
       type: 'enemy',
-      param: null
+      icon: 9,
+      x: 100,
+      w: 64,
+      h: 64
     }, {
       time: 30,
-      type: 'enemy',
-      param: null
+      type: 'enemy'
     }, {
       time: 60,
       type: 'enemy',
-      param: null
+      x: 500
     }
   ];
 

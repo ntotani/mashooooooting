@@ -10,7 +10,7 @@
     game = new Game(640, 480);
     game.preload('img/icon0.png');
     game.onload = function() {
-      var Enemy, Friend, HitawayEnemy, Ship, back, blueBulletLayer, boss, center, currentIndex, enemyLayer, f1, f2, friendLayer, mainState, map, redBulletLayer, ship, shipLayer, volt;
+      var Enemy, Friend, HitawayEnemy, Ship, back, blueBulletLayer, boss, center, currentIndex, enemyLayer, f1, f2, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
       Ship = (function(_super) {
 
         __extends(Ship, _super);
@@ -153,15 +153,19 @@
 
         __extends(Enemy, _super);
 
-        function Enemy(url) {
-          var _this = this;
-          Enemy.__super__.constructor.call(this, 64, 64);
+        function Enemy(param) {
+          var url,
+            _this = this;
+          Enemy.__super__.constructor.call(this, param.w || 32, param.h || 32);
+          url = daily_ranking.rankings[param.icon || 8].icon;
           Surface.load(url).onload = function(e) {
             var icon;
             icon = new Surface(_this.width, _this.height);
             icon.draw(e.target, 0, 0, _this.width, _this.height);
             return _this.image = icon;
           };
+          this.x = param.x || 0;
+          this.y = param.y || -this.height;
         }
 
         Enemy.prototype.onenterframe = function() {
@@ -233,19 +237,25 @@
       f2.x = 400;
       friendLayer.addChild(f1);
       friendLayer.addChild(f2);
-      currentIndex = 0;
+      currentIndex = lastAge = 0;
       mainState = function() {
-        var event;
-        if (this.age >= level[currentIndex].time) {
+        var event, _results;
+        _results = [];
+        while (this.age >= lastAge + level[currentIndex].time) {
           event = level[currentIndex];
           if (event.type === 'enemy') {
-            enemyLayer.addChild(new Enemy(daily_ranking.rankings[9].icon));
+            enemyLayer.addChild(new Enemy(event));
           }
           currentIndex++;
+          lastAge = this.age;
           if (currentIndex >= level.length) {
-            return game.rootScene.onenterframe = (function() {});
+            game.rootScene.onenterframe = (function() {});
+            break;
+          } else {
+            _results.push(void 0);
           }
         }
+        return _results;
       };
       game.rootScene.onenterframe = mainState;
       game.rootScene.addChild(back);
