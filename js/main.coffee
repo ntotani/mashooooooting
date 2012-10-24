@@ -52,7 +52,7 @@ window.onload = ->
       damage:->
         len = shipLayer.childNodes.length
         if len is 1
-          #alert 'game over'
+          game.end()
         else
           shipLayer.removeChild shipLayer.childNodes[len - 1]
 
@@ -126,12 +126,17 @@ window.onload = ->
         @tl.moveTo(@x, 10, 90).delay(30).then =>
           @center = @x + @width / 2
           @age = 0
+          @damage = @bossDamage
           @onenterframe = @waveState
         @damage = (->)
         @onenterframe = (->)
       waveState:->
         @x = @center + Math.sin(@age * 2 * Math.PI / 180) * 320 - @width / 2
         @shoot() if @age % 10 is 0
+      bossDamage:->
+        @hp--
+        if @hp <= 0
+          game.clear()
 
     shipLayer = new Group
     friendLayer = new Group
@@ -150,6 +155,12 @@ window.onload = ->
     battery.x = 10
     volt = new MutableText battery.x, battery.y + battery.height
     volt.text = '' + electric
+    start = new Sprite 236, 48
+    start.x = (game.width - start.width) / 2
+    start.y = (game.height - start.height) / 2
+    start.image = game.assets['img/start.png']
+    start.onenterframe = ->
+      @parentNode.removeChild this if @age > 90
 
     currentIndex = lastAge = 0
     mainState = ->
@@ -176,6 +187,7 @@ window.onload = ->
     game.rootScene.addChild redBulletLayer
     game.rootScene.addChild battery
     game.rootScene.addChild volt
+    game.rootScene.addChild start
 
     center = new google.maps.LatLng start_lat, start_lng
     map = new google.maps.Map back._element,

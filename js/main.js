@@ -10,7 +10,7 @@
     game = new Game(640, 480);
     game.preload('img/icon0.png', 'img/battery.gif');
     game.onload = function() {
-      var Boss, Enemy, Friend, Ship, back, battery, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
+      var Boss, Enemy, Friend, Ship, back, battery, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, start, volt;
       Ship = (function(_super) {
 
         __extends(Ship, _super);
@@ -95,7 +95,7 @@
           var len;
           len = shipLayer.childNodes.length;
           if (len === 1) {
-
+            return game.end();
           } else {
             return shipLayer.removeChild(shipLayer.childNodes[len - 1]);
           }
@@ -226,6 +226,7 @@
           this.tl.moveTo(this.x, 10, 90).delay(30).then(function() {
             _this.center = _this.x + _this.width / 2;
             _this.age = 0;
+            _this.damage = _this.bossDamage;
             return _this.onenterframe = _this.waveState;
           });
           this.damage = (function() {});
@@ -236,6 +237,13 @@
           this.x = this.center + Math.sin(this.age * 2 * Math.PI / 180) * 320 - this.width / 2;
           if (this.age % 10 === 0) {
             return this.shoot();
+          }
+        };
+
+        Boss.prototype.bossDamage = function() {
+          this.hp--;
+          if (this.hp <= 0) {
+            return game.clear();
           }
         };
 
@@ -259,6 +267,15 @@
       battery.x = 10;
       volt = new MutableText(battery.x, battery.y + battery.height);
       volt.text = '' + electric;
+      start = new Sprite(236, 48);
+      start.x = (game.width - start.width) / 2;
+      start.y = (game.height - start.height) / 2;
+      start.image = game.assets['img/start.png'];
+      start.onenterframe = function() {
+        if (this.age > 90) {
+          return this.parentNode.removeChild(this);
+        }
+      };
       currentIndex = lastAge = 0;
       mainState = function() {
         var event, _results;
@@ -292,6 +309,7 @@
       game.rootScene.addChild(redBulletLayer);
       game.rootScene.addChild(battery);
       game.rootScene.addChild(volt);
+      game.rootScene.addChild(start);
       center = new google.maps.LatLng(start_lat, start_lng);
       map = new google.maps.Map(back._element, {
         zoom: 18,
