@@ -56,19 +56,21 @@ window.onload = ->
           shipLayer.removeChild shipLayer.childNodes[len - 1]
 
     class Friend extends Ship
-      constructor:(url)->
-        super url
+      counter:0
+      constructor:(param)->
+        super home_timeline[Friend::counter].user.profile_image_url
+        Friend::counter++
         @tl.rotateTo(360, 30).then => @rotation = 0
         @tl.loop()
-        @x = 100
-        @y = 0
+        @x = param.x or (game.width / @width) / 2
+        @y = param.y or -@height
         @help = new MutableText @x - 16, @y - 16
         @help.text = 'HELP'
         friendLayer.addChild @help
         @onenterframe = @initState
       initState:->
         @y += 1
-        @help.x = @x
+        @help.x = @x - 16
         @help.y = @y - 16
         if @y > game.height
           @help.parentNode.removeChild @help
@@ -87,12 +89,12 @@ window.onload = ->
     class Enemy extends Sprite
       constructor:(param)->
         super param.w or 32, param.h or 32
-        url = daily_ranking.rankings[param.icon or 8].icon
+        url = daily_ranking.rankings[if param.icon? then param.icon else 9].icon
         Surface.load(url).onload = (e) =>
           icon = new Surface @width, @height
           icon.draw e.target, 0, 0, @width, @height
           @image = icon
-        @x = param.x or 0
+        @x = param.x or (game.width - @width) / 2
         @y = param.y or -@height
       onenterframe:->
         @y += 1
@@ -127,20 +129,11 @@ window.onload = ->
 
     back = new Sprite game.width, game.height
     ship = new Ship
-    boss = new Sprite 124, 124
-    boss.image = Surface.load daily_ranking.rankings[0].icon
-    boss.x = (game.width - boss.width) / 2
+    shipLayer.addChild ship
     volt = new MutableText 0, 0
     volt.text = '' + electric
     game.rootScene.addEventListener Event.TOUCH_START, (e)->
       ship.updateTarget e.x, e.y
-
-    shipLayer.addChild ship
-    f1 = new Friend(home_timeline[0].user.profile_image_url)
-    f2 = new Friend(home_timeline[1].user.profile_image_url)
-    f2.x = 400
-    friendLayer.addChild f1
-    friendLayer.addChild f2
 
     currentIndex = lastAge = 0
     mainState = ->
@@ -148,6 +141,8 @@ window.onload = ->
         event = level[currentIndex]
         if event.type is 'enemy'
           enemyLayer.addChild new Enemy event
+        else if event.type is 'friend'
+          friendLayer.addChild new Friend event
         currentIndex++
         lastAge = @age
         if currentIndex >= level.length
@@ -161,7 +156,6 @@ window.onload = ->
     game.rootScene.addChild enemyLayer
     game.rootScene.addChild blueBulletLayer
     game.rootScene.addChild redBulletLayer
-    game.rootScene.addChild boss
     game.rootScene.addChild volt
 
     center = new google.maps.LatLng start_lat, start_lng

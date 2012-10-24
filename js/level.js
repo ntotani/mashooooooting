@@ -16,6 +16,16 @@
       time: 60,
       type: 'enemy',
       x: 500
+    }, {
+      time: 60,
+      type: 'friend',
+      x: 500
+    }, {
+      time: 180,
+      type: 'enemy',
+      icon: 0,
+      w: 124,
+      h: 124
     }
   ];
 

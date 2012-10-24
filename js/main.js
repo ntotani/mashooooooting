@@ -10,7 +10,7 @@
     game = new Game(640, 480);
     game.preload('img/icon0.png');
     game.onload = function() {
-      var Enemy, Friend, HitawayEnemy, Ship, back, blueBulletLayer, boss, center, currentIndex, enemyLayer, f1, f2, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
+      var Enemy, Friend, HitawayEnemy, Ship, back, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
       Ship = (function(_super) {
 
         __extends(Ship, _super);
@@ -107,15 +107,18 @@
 
         __extends(Friend, _super);
 
-        function Friend(url) {
+        Friend.prototype.counter = 0;
+
+        function Friend(param) {
           var _this = this;
-          Friend.__super__.constructor.call(this, url);
+          Friend.__super__.constructor.call(this, home_timeline[Friend.prototype.counter].user.profile_image_url);
+          Friend.prototype.counter++;
           this.tl.rotateTo(360, 30).then(function() {
             return _this.rotation = 0;
           });
           this.tl.loop();
-          this.x = 100;
-          this.y = 0;
+          this.x = param.x || (game.width / this.width) / 2;
+          this.y = param.y || -this.height;
           this.help = new MutableText(this.x - 16, this.y - 16);
           this.help.text = 'HELP';
           friendLayer.addChild(this.help);
@@ -124,7 +127,7 @@
 
         Friend.prototype.initState = function() {
           this.y += 1;
-          this.help.x = this.x;
+          this.help.x = this.x - 16;
           this.help.y = this.y - 16;
           if (this.y > game.height) {
             this.help.parentNode.removeChild(this.help);
@@ -157,14 +160,14 @@
           var url,
             _this = this;
           Enemy.__super__.constructor.call(this, param.w || 32, param.h || 32);
-          url = daily_ranking.rankings[param.icon || 8].icon;
+          url = daily_ranking.rankings[param.icon != null ? param.icon : 9].icon;
           Surface.load(url).onload = function(e) {
             var icon;
             icon = new Surface(_this.width, _this.height);
             icon.draw(e.target, 0, 0, _this.width, _this.height);
             return _this.image = icon;
           };
-          this.x = param.x || 0;
+          this.x = param.x || (game.width - this.width) / 2;
           this.y = param.y || -this.height;
         }
 
@@ -223,20 +226,12 @@
       redBulletLayer = new Group;
       back = new Sprite(game.width, game.height);
       ship = new Ship;
-      boss = new Sprite(124, 124);
-      boss.image = Surface.load(daily_ranking.rankings[0].icon);
-      boss.x = (game.width - boss.width) / 2;
+      shipLayer.addChild(ship);
       volt = new MutableText(0, 0);
       volt.text = '' + electric;
       game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
         return ship.updateTarget(e.x, e.y);
       });
-      shipLayer.addChild(ship);
-      f1 = new Friend(home_timeline[0].user.profile_image_url);
-      f2 = new Friend(home_timeline[1].user.profile_image_url);
-      f2.x = 400;
-      friendLayer.addChild(f1);
-      friendLayer.addChild(f2);
       currentIndex = lastAge = 0;
       mainState = function() {
         var event, _results;
@@ -245,6 +240,8 @@
           event = level[currentIndex];
           if (event.type === 'enemy') {
             enemyLayer.addChild(new Enemy(event));
+          } else if (event.type === 'friend') {
+            friendLayer.addChild(new Friend(event));
           }
           currentIndex++;
           lastAge = this.age;
@@ -264,7 +261,6 @@
       game.rootScene.addChild(enemyLayer);
       game.rootScene.addChild(blueBulletLayer);
       game.rootScene.addChild(redBulletLayer);
-      game.rootScene.addChild(boss);
       game.rootScene.addChild(volt);
       center = new google.maps.LatLng(start_lat, start_lng);
       map = new google.maps.Map(back._element, {
