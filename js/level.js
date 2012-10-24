@@ -4,6 +4,16 @@
   window.level = [
     {
       time: 0,
+      type: 'boss',
+      icon: 0,
+      w: 124,
+      h: 124
+    }
+  ];
+
+  window.levell = [
+    {
+      time: 0,
       type: 'enemy',
       icon: 9,
       x: 100,
@@ -15,7 +25,8 @@
     }, {
       time: 60,
       type: 'enemy',
-      x: 500
+      x: 500,
+      hp: 10
     }, {
       time: 60,
       type: 'friend',

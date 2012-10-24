@@ -12,7 +12,7 @@ window.onload = ->
           icon.draw e.target, 0, 0, @width, @height
           @image = icon
         @x = (game.width - @width) / 2
-        @y = (game.height - @height) / 2
+        @y = game.height - @height - 10
       onenterframe:->
         @shoot() if @age % 10 is 0
       shoot:->
@@ -30,7 +30,7 @@ window.onload = ->
           for e in enemyLayer.childNodes
             if @intersect e
               @parentNode.removeChild this
-              enemyLayer.removeChild e
+              e.damage()
               return
           @parentNode.removeChild this if @y < -@height
         blueBulletLayer.addChild bullet
@@ -97,30 +97,41 @@ window.onload = ->
           @image = icon
         @x = param.x or (game.width - @width) / 2
         @y = param.y or -@height
+        @hp = param.hp or 1
       onenterframe:->
         @y += 1
-        if @age % 5 is 0
-          bullet = new Sprite 16, 16
-          bullet.image = game.assets['img/icon0.png']
-          bullet.frame = 60
-          bullet.x = @x + (@width - bullet.width) / 2
-          bullet.y = @y + @height
-          bullet.onenterframe = ->
-            @y += 10
-            for e in shipLayer.childNodes
-              if @intersect e
-                @parentNode.removeChild this
-                ship.damage()
-                return
-            @parentNode.removeChild this if @y > game.height
-          redBulletLayer.addChild bullet
+        @shoot() if @age % 5 is 0
+      shoot:->
+        bullet = new Sprite 16, 16
+        bullet.image = game.assets['img/icon0.png']
+        bullet.frame = 60
+        bullet.x = @x + (@width - bullet.width) / 2
+        bullet.y = @y + @height
+        bullet.onenterframe = ->
+          @y += 10
+          for e in shipLayer.childNodes
+            if @intersect e
+              @parentNode.removeChild this
+              ship.damage()
+              return
+          @parentNode.removeChild this if @y > game.height
+        redBulletLayer.addChild bullet
+      damage:->
+        @hp--
+        @parentNode.removeChild this if @hp <= 0
 
-    class HitawayEnemy extends Enemy
-      constructor:(url)->
-        super(url)
-        @onenterframe = @comeState
-      comeState:->
-      backState:->
+    class Boss extends Enemy
+      constructor:(param)->
+        super(param)
+        @tl.moveTo(@x, 10, 90).delay(30).then =>
+          @center = @x + @width / 2
+          @age = 0
+          @onenterframe = @waveState
+        @damage = (->)
+        @onenterframe = (->)
+      waveState:->
+        @x = @center + Math.sin(@age * 2 * Math.PI / 180) * 320 - @width / 2
+        @shoot() if @age % 10 is 0
 
     shipLayer = new Group
     friendLayer = new Group
@@ -148,6 +159,8 @@ window.onload = ->
           enemyLayer.addChild new Enemy event
         else if event.type is 'friend'
           friendLayer.addChild new Friend event
+        else if event.type is 'boss'
+          enemyLayer.addChild new Boss event
         currentIndex++
         lastAge = @age
         if currentIndex >= level.length

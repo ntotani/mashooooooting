@@ -10,7 +10,7 @@
     game = new Game(640, 480);
     game.preload('img/icon0.png', 'img/battery.gif');
     game.onload = function() {
-      var Enemy, Friend, HitawayEnemy, Ship, back, battery, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
+      var Boss, Enemy, Friend, Ship, back, battery, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
       Ship = (function(_super) {
 
         __extends(Ship, _super);
@@ -28,7 +28,7 @@
             return _this.image = icon;
           };
           this.x = (game.width - this.width) / 2;
-          this.y = (game.height - this.height) / 2;
+          this.y = game.height - this.height - 10;
         }
 
         Ship.prototype.onenterframe = function() {
@@ -58,7 +58,7 @@
               e = _ref[_i];
               if (this.intersect(e)) {
                 this.parentNode.removeChild(this);
-                enemyLayer.removeChild(e);
+                e.damage();
                 return;
               }
             }
@@ -170,54 +170,76 @@
           };
           this.x = param.x || (game.width - this.width) / 2;
           this.y = param.y || -this.height;
+          this.hp = param.hp || 1;
         }
 
         Enemy.prototype.onenterframe = function() {
-          var bullet;
           this.y += 1;
           if (this.age % 5 === 0) {
-            bullet = new Sprite(16, 16);
-            bullet.image = game.assets['img/icon0.png'];
-            bullet.frame = 60;
-            bullet.x = this.x + (this.width - bullet.width) / 2;
-            bullet.y = this.y + this.height;
-            bullet.onenterframe = function() {
-              var e, _i, _len, _ref;
-              this.y += 10;
-              _ref = shipLayer.childNodes;
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                e = _ref[_i];
-                if (this.intersect(e)) {
-                  this.parentNode.removeChild(this);
-                  ship.damage();
-                  return;
-                }
+            return this.shoot();
+          }
+        };
+
+        Enemy.prototype.shoot = function() {
+          var bullet;
+          bullet = new Sprite(16, 16);
+          bullet.image = game.assets['img/icon0.png'];
+          bullet.frame = 60;
+          bullet.x = this.x + (this.width - bullet.width) / 2;
+          bullet.y = this.y + this.height;
+          bullet.onenterframe = function() {
+            var e, _i, _len, _ref;
+            this.y += 10;
+            _ref = shipLayer.childNodes;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              e = _ref[_i];
+              if (this.intersect(e)) {
+                this.parentNode.removeChild(this);
+                ship.damage();
+                return;
               }
-              if (this.y > game.height) {
-                return this.parentNode.removeChild(this);
-              }
-            };
-            return redBulletLayer.addChild(bullet);
+            }
+            if (this.y > game.height) {
+              return this.parentNode.removeChild(this);
+            }
+          };
+          return redBulletLayer.addChild(bullet);
+        };
+
+        Enemy.prototype.damage = function() {
+          this.hp--;
+          if (this.hp <= 0) {
+            return this.parentNode.removeChild(this);
           }
         };
 
         return Enemy;
 
       })(Sprite);
-      HitawayEnemy = (function(_super) {
+      Boss = (function(_super) {
 
-        __extends(HitawayEnemy, _super);
+        __extends(Boss, _super);
 
-        function HitawayEnemy(url) {
-          HitawayEnemy.__super__.constructor.call(this, url);
-          this.onenterframe = this.comeState;
+        function Boss(param) {
+          var _this = this;
+          Boss.__super__.constructor.call(this, param);
+          this.tl.moveTo(this.x, 10, 90).delay(30).then(function() {
+            _this.center = _this.x + _this.width / 2;
+            _this.age = 0;
+            return _this.onenterframe = _this.waveState;
+          });
+          this.damage = (function() {});
+          this.onenterframe = (function() {});
         }
 
-        HitawayEnemy.prototype.comeState = function() {};
+        Boss.prototype.waveState = function() {
+          this.x = this.center + Math.sin(this.age * 2 * Math.PI / 180) * 320 - this.width / 2;
+          if (this.age % 10 === 0) {
+            return this.shoot();
+          }
+        };
 
-        HitawayEnemy.prototype.backState = function() {};
-
-        return HitawayEnemy;
+        return Boss;
 
       })(Enemy);
       shipLayer = new Group;
@@ -247,6 +269,8 @@
             enemyLayer.addChild(new Enemy(event));
           } else if (event.type === 'friend') {
             friendLayer.addChild(new Friend(event));
+          } else if (event.type === 'boss') {
+            enemyLayer.addChild(new Boss(event));
           }
           currentIndex++;
           lastAge = this.age;
