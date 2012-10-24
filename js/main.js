@@ -8,9 +8,9 @@
   window.onload = function() {
     var game;
     game = new Game(640, 480);
-    game.preload('img/icon0.png');
+    game.preload('img/icon0.png', 'img/battery.gif');
     game.onload = function() {
-      var Enemy, Friend, HitawayEnemy, Ship, back, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
+      var Enemy, Friend, HitawayEnemy, Ship, back, battery, blueBulletLayer, center, currentIndex, enemyLayer, friendLayer, lastAge, mainState, map, redBulletLayer, ship, shipLayer, volt;
       Ship = (function(_super) {
 
         __extends(Ship, _super);
@@ -44,6 +44,7 @@
             return;
           }
           volt.text = '' + (voltNum - 1);
+          battery.frame = voltNum / 1000 | 0;
           bullet = new Sprite(16, 16);
           bullet.image = game.assets['img/icon0.png'];
           bullet.frame = 48;
@@ -227,11 +228,15 @@
       back = new Sprite(game.width, game.height);
       ship = new Ship;
       shipLayer.addChild(ship);
-      volt = new MutableText(0, 0);
-      volt.text = '' + electric;
       game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
         return ship.updateTarget(e.x, e.y);
       });
+      battery = new Sprite(48, 40);
+      battery.image = game.assets['img/battery.gif'];
+      battery.frame = 3;
+      battery.x = 10;
+      volt = new MutableText(battery.x, battery.y + battery.height);
+      volt.text = '' + electric;
       currentIndex = lastAge = 0;
       mainState = function() {
         var event, _results;
@@ -261,6 +266,7 @@
       game.rootScene.addChild(enemyLayer);
       game.rootScene.addChild(blueBulletLayer);
       game.rootScene.addChild(redBulletLayer);
+      game.rootScene.addChild(battery);
       game.rootScene.addChild(volt);
       center = new google.maps.LatLng(start_lat, start_lng);
       map = new google.maps.Map(back._element, {

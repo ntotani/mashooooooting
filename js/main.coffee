@@ -2,7 +2,7 @@ enchant()
 
 window.onload = ->
   game = new Game 640, 480
-  game.preload 'img/icon0.png'
+  game.preload 'img/icon0.png', 'img/battery.gif'
   game.onload = ->
     class Ship extends Sprite
       constructor:(url=twitter_info['profile_image_url'])->
@@ -19,6 +19,7 @@ window.onload = ->
         voltNum = parseInt volt.text
         return if voltNum <= 0
         volt.text = '' + (voltNum - 1)
+        battery.frame = voltNum / 1000 | 0
         bullet = new Sprite 16, 16
         bullet.image = game.assets['img/icon0.png']
         bullet.frame = 48
@@ -130,10 +131,14 @@ window.onload = ->
     back = new Sprite game.width, game.height
     ship = new Ship
     shipLayer.addChild ship
-    volt = new MutableText 0, 0
-    volt.text = '' + electric
     game.rootScene.addEventListener Event.TOUCH_START, (e)->
       ship.updateTarget e.x, e.y
+    battery = new Sprite 48, 40
+    battery.image = game.assets['img/battery.gif']
+    battery.frame = 3
+    battery.x = 10
+    volt = new MutableText battery.x, battery.y + battery.height
+    volt.text = '' + electric
 
     currentIndex = lastAge = 0
     mainState = ->
@@ -156,6 +161,7 @@ window.onload = ->
     game.rootScene.addChild enemyLayer
     game.rootScene.addChild blueBulletLayer
     game.rootScene.addChild redBulletLayer
+    game.rootScene.addChild battery
     game.rootScene.addChild volt
 
     center = new google.maps.LatLng start_lat, start_lng
