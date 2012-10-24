@@ -109,6 +109,13 @@ window.onload = ->
             @parentNode.removeChild this if @y > game.height
           redBulletLayer.addChild bullet
 
+    class HitawayEnemy extends Enemy
+      constructor:(url)->
+        super(url)
+        @onenterframe = @comeState
+      comeState:->
+      backState:->
+
     shipLayer = new Group
     friendLayer = new Group
     enemyLayer = new Group
@@ -131,8 +138,16 @@ window.onload = ->
     f2.x = 400
     friendLayer.addChild f1
     friendLayer.addChild f2
-    e1 = new Enemy daily_ranking.rankings[9].icon
-    enemyLayer.addChild e1
+
+    currentIndex = 0
+    mainState = ->
+      if @age >= level[currentIndex].time
+        event = level[currentIndex]
+        if event.type is 'enemy'
+          enemyLayer.addChild new Enemy daily_ranking.rankings[9].icon
+        currentIndex++
+        game.rootScene.onenterframe = (->) if currentIndex >= level.length
+    game.rootScene.onenterframe = mainState
 
     game.rootScene.addChild back
     game.rootScene.addChild shipLayer

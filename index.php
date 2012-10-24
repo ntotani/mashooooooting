@@ -54,6 +54,7 @@ while (!$file->eof()) {
         <script type="text/javascript" src="js/enchant.min.js"></script>
         <script type="text/javascript" src="js/util.enchant.js"></script>
         <script type="text/javascript" src="js/tl.enchant.js"></script>
+        <script type="text/javascript" src="js/level.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript">
             var daily_ranking = <?php echo $daily_ranking; ?>;

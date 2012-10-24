@@ -10,7 +10,7 @@
     game = new Game(640, 480);
     game.preload('img/icon0.png');
     game.onload = function() {
-      var Enemy, Friend, Ship, back, blueBulletLayer, boss, center, e1, enemyLayer, f1, f2, friendLayer, map, redBulletLayer, ship, shipLayer, volt;
+      var Enemy, Friend, HitawayEnemy, Ship, back, blueBulletLayer, boss, center, currentIndex, enemyLayer, f1, f2, friendLayer, mainState, map, redBulletLayer, ship, shipLayer, volt;
       Ship = (function(_super) {
 
         __extends(Ship, _super);
@@ -94,7 +94,7 @@
           var len;
           len = shipLayer.childNodes.length;
           if (len === 1) {
-            return alert('game over');
+
           } else {
             return shipLayer.removeChild(shipLayer.childNodes[len - 1]);
           }
@@ -196,6 +196,22 @@
         return Enemy;
 
       })(Sprite);
+      HitawayEnemy = (function(_super) {
+
+        __extends(HitawayEnemy, _super);
+
+        function HitawayEnemy(url) {
+          HitawayEnemy.__super__.constructor.call(this, url);
+          this.onenterframe = this.comeState;
+        }
+
+        HitawayEnemy.prototype.comeState = function() {};
+
+        HitawayEnemy.prototype.backState = function() {};
+
+        return HitawayEnemy;
+
+      })(Enemy);
       shipLayer = new Group;
       friendLayer = new Group;
       enemyLayer = new Group;
@@ -217,8 +233,21 @@
       f2.x = 400;
       friendLayer.addChild(f1);
       friendLayer.addChild(f2);
-      e1 = new Enemy(daily_ranking.rankings[9].icon);
-      enemyLayer.addChild(e1);
+      currentIndex = 0;
+      mainState = function() {
+        var event;
+        if (this.age >= level[currentIndex].time) {
+          event = level[currentIndex];
+          if (event.type === 'enemy') {
+            enemyLayer.addChild(new Enemy(daily_ranking.rankings[9].icon));
+          }
+          currentIndex++;
+          if (currentIndex >= level.length) {
+            return game.rootScene.onenterframe = (function() {});
+          }
+        }
+      };
+      game.rootScene.onenterframe = mainState;
       game.rootScene.addChild(back);
       game.rootScene.addChild(shipLayer);
       game.rootScene.addChild(friendLayer);
